@@ -6,6 +6,7 @@ from src.database import (
     init_db, get_latest_goal, get_topics, get_sessions,
     save_sessions, delete_sessions, set_session_completed,
 )
+from src.user import get_user_id
 from src.study_planner import build_schedule
 
 init_db()
@@ -14,7 +15,7 @@ st.set_page_config(page_title="Study Planner", page_icon="📅", layout="wide")
 
 st.title("📅 Weekly Study Planner")
 
-goal = get_latest_goal()
+goal = get_latest_goal(get_user_id())
 if not goal:
     st.warning("Please save a learning goal first on the Learning Goal page.")
     st.stop()
