@@ -4,6 +4,7 @@ from src.database import (
     init_db, get_latest_goal, get_topics, save_topics,
     delete_topics, set_topic_completed,
 )
+from src.user import get_user_id
 from src.roadmap_generator import generate_roadmap
 
 init_db()
@@ -12,7 +13,7 @@ st.set_page_config(page_title="My Roadmap", page_icon="🗺️", layout="wide")
 
 st.title("🗺️ My Roadmap")
 
-goal = get_latest_goal()
+goal = get_latest_goal(get_user_id())
 if not goal:
     st.warning("Please save a learning goal first on the Learning Goal page.")
     st.stop()
