@@ -135,6 +135,55 @@ def set_topic_completed(topic_id, completed):
         )
 
 
+def save_sessions(goal_id, sessions):
+    """Save a list of study sessions (dicts) for a goal."""
+    with get_connection() as conn:
+        for s in sessions:
+            conn.execute(
+                """
+                INSERT INTO sessions
+                    (goal_id, topic_id, week_number, day_label, objective,
+                     practice_activity, duration_hours)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                """,
+                (goal_id, s["topic_id"], s["week_number"], s["day_label"],
+                 s["objective"], s["practice_activity"], s["duration_hours"]),
+            )
+
+
+def get_sessions(goal_id):
+    """Return all study sessions for a goal, in order."""
+    with get_connection() as conn:
+        rows = conn.execute(
+            """
+            SELECT s.*, t.title AS topic_title
+            FROM sessions s
+            LEFT JOIN topics t ON t.id = s.topic_id
+            WHERE s.goal_id = ?
+            ORDER BY s.id
+            """,
+            (goal_id,),
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+
+def delete_sessions(goal_id):
+    """Remove the schedule so a new one can be made."""
+    with get_connection() as conn:
+        conn.execute("DELETE FROM sessions WHERE goal_id = ?", (goal_id,))
+
+
+def set_session_completed(session_id, completed):
+    """Mark a study session done or not done."""
+    with get_connection() as conn:
+        conn.execute(
+            "UPDATE sessions SET completed = ?, completed_at = ? WHERE id = ?",
+            (1 if completed else 0,
+             datetime.now().isoformat() if completed else None,
+             session_id),
+        )
+
+
 if __name__ == "__main__":
     # Quick self-test: run `python src/database.py`
     init_db()
