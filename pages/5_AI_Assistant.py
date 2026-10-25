@@ -2,6 +2,7 @@ import streamlit as st
 
 from src.ai_assistant import ask_gemini, build_tutor_instruction, get_api_key
 from src.database import init_db, get_latest_goal
+from src.user import get_user_id
 
 init_db()
 
@@ -9,7 +10,7 @@ st.set_page_config(page_title="AI Assistant", page_icon="🤖", layout="wide")
 
 st.title("🤖 AI Learning Assistant")
 
-goal = get_latest_goal()
+goal = get_latest_goal(get_user_id())
 if not goal:
     st.warning("Please save a learning goal first on the Learning Goal page.")
     st.stop()
