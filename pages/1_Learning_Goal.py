@@ -3,6 +3,7 @@ from datetime import date, timedelta
 import streamlit as st
 
 from src.database import init_db, save_goal, get_latest_goal
+from src.user import get_user_id
 
 init_db()
 
@@ -54,12 +55,12 @@ if submitted:
     else:
         save_goal(
             goal.strip(), level, hours_per_day, days_per_week,
-            target_date, learning_style,
+            target_date, learning_style, get_user_id(),
         )
         st.success("Goal saved! Your roadmap comes in the next step.")
 
 # ---------- Show the saved goal ----------
-saved = get_latest_goal()
+saved = get_latest_goal(get_user_id())
 if saved:
     st.markdown("---")
     st.subheader("Current saved goal")
