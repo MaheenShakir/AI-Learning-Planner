@@ -1,11 +1,12 @@
 import os
+import time
 
 import streamlit as st
 from google import genai
 from google.genai import types
 
-# Change the model name here if Google retires it.
-MODEL_NAME = "gemini-3.8-flash"
+# Models are tried in order. If one is busy, the next one is used.
+MODELS = ["gemini-3.8-flash", "gemini-2.5-flash", "gemini-2.5-flash-lite"]
 
 
 def get_api_key():
@@ -30,7 +31,7 @@ def build_tutor_instruction(goal):
 
 
 def ask_gemini(prompt, system_instruction=None):
-    """Send a prompt to Gemini and return the text answer."""
+    """Send a prompt to Gemini. Retry once per model, then try the next model."""
     api_key = get_api_key()
     if not api_key:
         raise ValueError("GEMINI_API_KEY is not set.")
@@ -39,9 +40,17 @@ def ask_gemini(prompt, system_instruction=None):
         api_key=api_key,
         http_options=types.HttpOptions(timeout=30000),
     )
-    response = client.models.generate_content(
-        model=MODEL_NAME,
-        contents=prompt,
-        config=types.GenerateContentConfig(system_instruction=system_instruction),
-    )
-    return response.text
+    config = types.GenerateContentConfig(system_instruction=system_instruction)
+
+    last_error = None
+    for model in MODELS:
+        for attempt in range(2):
+            try:
+                response = client.models.generate_content(
+                    model=model, contents=prompt, config=config
+                )
+                return response.text
+            except Exception as e:
+                last_error = e
+                time.sleep(1.5)  # short pause before retrying
+    raise last_error
