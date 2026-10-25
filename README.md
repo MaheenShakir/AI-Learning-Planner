@@ -4,8 +4,7 @@ An AI-powered study planner built with Streamlit. Tell it what you want to learn
 
 **🔗 Live demo:** https://ai-learning-planner-k5usduw5wqbnzlyrgcyb5x.streamlit.app
 
-<!-- Add a screenshot of the dashboard here:
-![Dashboard](screenshots/dashboard.png) -->
+   ![Dashboard](dashboard.png)
 
 ## ✨ Features
 
