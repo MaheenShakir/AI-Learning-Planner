@@ -22,6 +22,7 @@ def init_db():
             """
             CREATE TABLE IF NOT EXISTS goals (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id TEXT DEFAULT '',
                 goal TEXT NOT NULL,
                 level TEXT NOT NULL,
                 hours_per_day REAL NOT NULL,
@@ -63,30 +64,45 @@ def init_db():
             );
             """
         )
+        # Older databases don't have user_id yet, so add it.
+        columns = [row["name"] for row in conn.execute("PRAGMA table_info(goals)")]
+        if "user_id" not in columns:
+            conn.execute("ALTER TABLE goals ADD COLUMN user_id TEXT DEFAULT ''")
 
 
-def save_goal(goal, level, hours_per_day, days_per_week, target_date, learning_style):
+def save_goal(goal, level, hours_per_day, days_per_week, target_date,
+              learning_style, user_id=""):
     """Save a new learning goal and return its id."""
     with get_connection() as conn:
         cursor = conn.execute(
             """
             INSERT INTO goals
                 (goal, level, hours_per_day, days_per_week,
-                 target_date, learning_style, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+                 target_date, learning_style, created_at, user_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (goal, level, hours_per_day, days_per_week,
-             str(target_date), learning_style, datetime.now().isoformat()),
+             str(target_date), learning_style, datetime.now().isoformat(),
+             user_id),
         )
         return cursor.lastrowid
 
 
-def get_latest_goal():
-    """Return the most recent goal as a dict, or None if there isn't one."""
+def get_latest_goal(user_id=None):
+    """Return the most recent goal for this visitor, or None.
+
+    With no user_id it returns the latest goal of anyone (old behavior).
+    """
     with get_connection() as conn:
-        row = conn.execute(
-            "SELECT * FROM goals ORDER BY id DESC LIMIT 1"
-        ).fetchone()
+        if user_id is None:
+            row = conn.execute(
+                "SELECT * FROM goals ORDER BY id DESC LIMIT 1"
+            ).fetchone()
+        else:
+            row = conn.execute(
+                "SELECT * FROM goals WHERE user_id = ? ORDER BY id DESC LIMIT 1",
+                (user_id,),
+            ).fetchone()
         return dict(row) if row else None
 
 
