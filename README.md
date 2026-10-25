@@ -4,7 +4,7 @@ An AI-powered study planner built with Streamlit. Tell it what you want to learn
 
 **🔗 Live demo:** https://ai-learning-planner-k5usduw5wqbnzlyrgcyb5x.streamlit.app
 
-   **Note:** This is a demo app. All visitors share one database, and saved data may reset when the app restarts. A cloud database is planned for a future version.
+      > **Note:** This is a demo app. Each visitor gets a private workspace tied to their browser link, but saved data may reset when the app restarts. A cloud database is planned for a future version.
 
    ![Dashboard](dashboard.png)
 
