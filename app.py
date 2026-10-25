@@ -1,6 +1,7 @@
 import streamlit as st
 
 from src.database import init_db, get_latest_goal, get_topics
+from src.user import get_user_id
 
 init_db()
 
@@ -15,7 +16,7 @@ st.caption("Turn your goals into a realistic, trackable learning roadmap.")
 
 st.markdown("---")
 
-goal = get_latest_goal()
+goal = get_latest_goal(get_user_id())
 topics = get_topics(goal["id"]) if goal else []
 total = len(topics)
 done = sum(1 for t in topics if t["completed"])
@@ -39,4 +40,5 @@ st.markdown(
 """
 )
 
+st.caption("🔒 Your goal and progress are private to your browser link. Bookmark this page to come back to them.")
 st.info("Use the sidebar to move between pages: set a goal, build your roadmap, plan your week, and track your progress.")
