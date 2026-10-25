@@ -90,6 +90,51 @@ def get_latest_goal():
         return dict(row) if row else None
 
 
+def save_topics(goal_id, topics):
+    """Save a list of roadmap topics (dicts) for a goal."""
+    with get_connection() as conn:
+        for position, t in enumerate(topics, start=1):
+            conn.execute(
+                """
+                INSERT INTO topics
+                    (goal_id, phase, title, description, estimated_hours,
+                     practice, mini_project, resources, position)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (goal_id, t["phase"], t["title"], t["description"],
+                 t["estimated_hours"], t["practice"], t["mini_project"],
+                 t["resources"], position),
+            )
+
+
+def get_topics(goal_id):
+    """Return all topics for a goal, in order, as a list of dicts."""
+    with get_connection() as conn:
+        rows = conn.execute(
+            "SELECT * FROM topics WHERE goal_id = ? ORDER BY position",
+            (goal_id,),
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+
+def delete_topics(goal_id):
+    """Remove the roadmap (and its sessions) so a new one can be made."""
+    with get_connection() as conn:
+        conn.execute("DELETE FROM sessions WHERE goal_id = ?", (goal_id,))
+        conn.execute("DELETE FROM topics WHERE goal_id = ?", (goal_id,))
+
+
+def set_topic_completed(topic_id, completed):
+    """Mark a topic done or not done."""
+    with get_connection() as conn:
+        conn.execute(
+            "UPDATE topics SET completed = ?, completed_at = ? WHERE id = ?",
+            (1 if completed else 0,
+             datetime.now().isoformat() if completed else None,
+             topic_id),
+        )
+
+
 if __name__ == "__main__":
     # Quick self-test: run `python src/database.py`
     init_db()
