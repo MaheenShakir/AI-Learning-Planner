@@ -35,7 +35,7 @@ def ask_gemini(prompt, system_instruction=None):
     if not api_key:
         raise ValueError("GEMINI_API_KEY is not set.")
 
-        client = genai.Client(
+    client = genai.Client(
         api_key=api_key,
         http_options=types.HttpOptions(timeout=30000),
     )
