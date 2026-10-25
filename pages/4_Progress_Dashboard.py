@@ -6,6 +6,7 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from src.database import init_db, get_latest_goal, get_topics, get_sessions
+from src.user import get_user_id
 
 init_db()
 
@@ -37,7 +38,7 @@ def style(fig, height=320):
 
 st.title("📊 Progress Dashboard")
 
-goal = get_latest_goal()
+goal = get_latest_goal(get_user_id())
 if not goal:
     st.warning("Please save a learning goal first on the Learning Goal page.")
     st.stop()
