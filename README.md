@@ -97,6 +97,3 @@ API keys are read from secrets or environment variables and are never stored in 
 - Export the roadmap to PDF
 - Reminders and streak tracking
 
-## 👩‍💻 Author
-
-**Maheen Shakir**, Data Science student.
